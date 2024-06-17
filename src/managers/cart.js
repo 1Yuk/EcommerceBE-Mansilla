@@ -18,7 +18,7 @@ class Cart {
 
 class CartManager {
     constructor() {
-        this.path = './src/models/carts.json';
+        this.path = './src/files/carts.json';
         this.nextId = 0;
         this.carts = []
     }

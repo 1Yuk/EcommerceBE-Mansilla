@@ -1,10 +1,11 @@
 import { Router } from 'express';
-import { ProductManager } from '../models/products.js';
+import { ProductManager } from '../managers/products.js';
 
 const prodsRouter = Router();
 const manager = new ProductManager();
 
 prodsRouter.get('/', async (req, res) => {
+    console.log('llego');
     let limit = parseInt(req.query.limit);
     console.log(limit)
     if (limit) {
