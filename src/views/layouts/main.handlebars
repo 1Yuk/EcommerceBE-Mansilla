@@ -7,6 +7,27 @@
     <title>Navbar y Footer con Bootstrap (Fondo Oscuro)</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <style>
+        .position-relative {
+            position: relative;
+        }
+
+        .position-absolute {
+            position: absolute;
+        }
+
+        .top-0 {
+            top: 9px;
+        }
+
+        .start-0 {
+            left: 26px;
+        }
+
+        .translate-middle {
+            transform: translate(-50%, -50%);
+        }
+    </style>
 </head>
 
 <body>
@@ -28,13 +49,42 @@
                 <li class="nav-item">
                     <a class="nav-link" href="#">Contacto</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link position-relative" id="cartButton" data-toggle="modal" data-target="#cartModal">
+                        <i class="fas fa-shopping-cart text-light"></i>
+                        <span
+                            class="badge rounded-pill bg-secondary text-light position-absolute top-0 start-0 translate-middle"
+                            id="cartItemCount">0</span>
+                    </a>
+                </li>
             </ul>
         </div>
     </nav>
 
-    <div class="container">
-        {{{body}}}
+    <div>
+        <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-dark" id="cartModalLabel">Carrito de Compras</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Aquí se mostrarán los productos del carrito -->
+                        <div id="cartProducts"></div>
+                        <a href="/carts/668d7e98fca562012be5d451" class="btn btn-primary btn-block">Ver productos</a>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-primary">Comprar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+    {{{body}}}
 
     <footer class="bg-dark text-light text-center py-3">
         <p>&copy; 2024 Mi Sitio. Todos los derechos reservados.</p>
@@ -48,8 +98,9 @@
         integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
         crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-        crossorigin="anonymous"></script>
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+        </script>
+    <script src="https://kit.fontawesome.com/201f492e52.js" crossorigin="anonymous"></script>
 </body>
 
 </html>

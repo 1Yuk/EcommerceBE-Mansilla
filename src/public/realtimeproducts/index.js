@@ -10,20 +10,20 @@ createProductForm.addEventListener("submit", (event) => {
 
     const title = document.getElementById("title").value;
     const description = document.getElementById("description").value;
+    const price = document.getElementById("price").value;
     const thumbnail = document.getElementById("thumbnail").value;
     const code = document.getElementById("code").value;
-    const id = document.getElementById("id").value;
-    const price = document.getElementById("price").value;
     const stock = document.getElementById("stock").value;
+    const category = document.getElementById("category").value;
 
     const product = {
         title,
         description,
+        price: parseFloat(price),
         thumbnail,
         code,
-        price: parseFloat(price),
         stock: parseFloat(stock),
-        id: parseFloat(id)
+        category
     };
 
     socketClient.emit("createProduct", product);

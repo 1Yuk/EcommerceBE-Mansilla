@@ -1,69 +1,17 @@
-import { promises as fs } from 'fs';
-
-class Product {
-    constructor(id, title, description, price, thumbnail, code, stock) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.price = price;
-        this.thumbnail = thumbnail;
-        this.code = code;
-        this.stock = stock;
-        this.status = true;
-    }
-}
+import Product from '../models/Product.js'
+import mongoose from 'mongoose';
+const { ObjectId } = mongoose.Types;
 
 export class ProductManager {
-    constructor() {
-        this.products = [];
-        this.nextId = 1;
-        this.path = './src/files/products.json';
-    }
-
-    async saveToFile() {
-        try {
-            await fs.writeFile(this.path, JSON.stringify(this.products, null, 2));
-        } catch (error) {
-            console.error('Error al guardar en el archivo:', error);
-            throw error;
-        }
-    }
-
-    async recoverProducts() {
-        try {
-            const data = await fs.readFile(this.path, 'utf-8');
-            if (data && data.length > 0) {
-                this.products = JSON.parse(data);
-                this.products = this.products.filter(product => product.status === true);
-                const maxIdProduct = this.products.reduce((prev, curr) => (prev.id > curr.id) ? prev : curr, { id: 0 });
-                this.nextId = maxIdProduct.id + 1;
-            } else {
-                this.products = [];
-                this.nextId = 1;
-            }
-        } catch (error) {
-            if (error.code !== 'ENOENT') {
-                console.error('Error al leer el archivo:', error);
-                this.products = [];
-                this.nextId = 1;
-            }
-        }
-    }
-
-    async addProduct(title, id, description, price, thumbnail, code, stock) {
-        await this.recoverProducts();
-
-        const duplicateCode = this.products.some(product => product.code === code);
+    async addProduct(title, description, price, thumbnail, code, stock, category) {
+        const duplicateCode = await Product.findOne({ code });
         if (duplicateCode) {
             console.log('El código ya existe');
             return { success: false, message: "El código ya existe" };
         }
-
-        const newProduct = new Product(id, title, description, price, thumbnail, code, stock);
-        this.products.push(newProduct);
-
+        const newProduct = new Product({ title, description, price, thumbnail, code, stock, category });
         try {
-            await this.saveToFile();
+            await newProduct.save();
             console.log('Producto añadido correctamente');
             return { success: true, message: "Producto añadido correctamente", product: newProduct };
         } catch (error) {
@@ -71,41 +19,71 @@ export class ProductManager {
             return { success: false, message: "Error al guardar productos" };
         }
     }
-
-    async getProducts() {
-        await this.recoverProducts();
-        return this.products;
+    async getProducts({ limit = 10, page = 1, sort = 'asc' } = {}) {
+        try {
+            const sortOrder = sort === 'asc' ? 1 : -1;
+            const skip = (page - 1) * limit;
+            const products = await Product.find({ status: true })
+                .sort({ price: sortOrder })
+                .skip(skip)
+                .limit(limit);
+            return products;
+        } catch (error) {
+            console.error('Error al obtener productos:', error.message);
+            return [];
+        }
     }
 
     async removeProduct(id) {
-        const index = this.products.findIndex(product => product.id === id);
-        if (index !== -1) {
-            this.products[index].status = false;
-            await this.saveToFile();
-        } else {
-            console.log('Producto no encontrado');
+        try {
+            const product = await Product.findById(id);
+            if (product) {
+                product.status = false;
+                await product.save();
+                console.log('Producto eliminado correctamente');
+            } else {
+                console.log('Producto no encontrado');
+            }
+        } catch (error) {
+            console.error('Error al eliminar producto:', error.message);
         }
     }
 
     async updateProduct(id, updatedProduct) {
-        const index = this.products.findIndex(product => product.id === id);
-        if (index !== -1) {
-            this.products[index] = { ...this.products[index], ...updatedProduct };
-            await this.saveToFile();
-        } else {
-            console.log('Producto no encontrado');
+        try {
+            const product = await Product.findById(id);
+            if (product) {
+                Object.assign(product, updatedProduct);
+                await product.save();
+                console.log('Producto actualizado correctamente');
+            } else {
+                console.log('Producto no encontrado');
+            }
+        } catch (error) {
+            console.error('Error al actualizar producto:', error.message);
         }
     }
 
     async getProductById(id) {
-        await this.recoverProducts();
-        const product = this.products.find(product => product.id === id);
-        return product || null;
+        try {
+            if (!ObjectId.isValid(id)) {
+                // console.log('ID inválido:', id);
+                return null;
+            }
+            const product = await Product.findById(id);
+            return product || null;
+        } catch (error) {
+            console.error('Error al obtener producto:', error.message);
+            return null;
+        }
     }
-
     async getProductByCode(code) {
-        await this.recoverProducts();
-        const product = this.products.find(product => product.code === code);
-        return product || null;
+        try {
+            const product = await Product.findOne({ code });
+            return product || null;
+        } catch (error) {
+            console.error('Error al obtener producto por código:', error.message);
+            return null;
+        }
     }
 }

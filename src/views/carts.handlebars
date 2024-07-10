@@ -49,19 +49,16 @@
     }
 </style>
 
-<div class="col-md-6">
-    <div class="product-cards">
-        {{#each products}}
-        <div class="custom-card">
-            <img src={{thumbnail}} class="card-img-top" alt="Producto">
-            <div class="card-body">
-                <h5 class="card-title">{{title}}</h5>
-                <p class="card-text">{{description}}</p>
-                <p class="card-text">Stock: {{stock}}</p>
-                <p class="card-text">Precio: {{price}}</p>
-                <a href="/products/{{this._id}}" class="btn btn-primary btn-block">Ver más</a>
-            </div>
+<div class="card-wrapper">
+    {{#each cart.products}}
+    <div class="custom-card">
+        <img src="{{this.product.thumbnail}}" class="card-img-top" alt="Producto">
+        <div class="card-body">
+            <h5 class="card-title">{{this.product.title}}</h5>
+            <p class="card-text">{{this.product.description}}</p>
+            <p class="card-text">Stock: {{this.product.stock}}</p>
+            <p class="card-text">Precio: {{this.product.price}}</p>
         </div>
-        {{/each}}
     </div>
+    {{/each}}
 </div>

@@ -8,6 +8,7 @@ import viewsRouter from './routes/views.routes.js';
 import prodsRouter from './routes/products.routes.js';
 import cartsRouter from './routes/carts.routes.js';
 import { ProductManager } from './managers/products.js';
+import mongoose from 'mongoose';
 
 // Creación de instancia de ProductManager
 const productManager = new ProductManager();
@@ -27,7 +28,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Configuración de Handlebars
-app.engine('handlebars', engine());
+const hbs = engine({
+    runtimeOptions: {
+        allowProtoPropertiesByDefault: true,
+        allowProtoMethodsByDefault: true
+    }
+});
+
+app.engine('handlebars', hbs);
 app.set('view engine', 'handlebars');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -63,4 +71,13 @@ io.on('connection', (socket) => {
     socket.on('error', (error) => {
         console.error('Error WebSocket:', error);
     });
+});
+
+// Configuración de Mongoose
+mongoose.connect('mongodb+srv://yukfly1:XTzXjRuLvxvZuLdn@ecommercebe.0gad27b.mongodb.net/?retryWrites=true&w=majority&appName=EcommerceBE', {
+    // Validaciones ----
+}).then(() => {
+    console.log('Conectado a MongoDB');
+}).catch(err => {
+    console.error('Error al conectar a MongoDB', err);
 });
