@@ -4,11 +4,21 @@ import { Server as SocketServer } from 'socket.io';
 import { engine } from 'express-handlebars';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
+import session from 'express-session';
+import passport from 'passport';
+import cookieParser from 'cookie-parser';
 import viewsRouter from './routes/views.routes.js';
 import prodsRouter from './routes/products.routes.js';
 import cartsRouter from './routes/carts.routes.js';
+import userRouter from './routes/users.routes.js'
+import authRoutes from './routes/auth.routes.js';
+import protectedRouter from './routes/protected.routes.js';
 import { ProductManager } from './managers/products.js';
+import currentUser from './middleware/currentUser.js'
 import mongoose from 'mongoose';
+import './utils/passport.js';
+import dotenv from 'dotenv';
+dotenv.config();
 
 // Creación de instancia de ProductManager
 const productManager = new ProductManager();
@@ -26,6 +36,18 @@ const PORT = 8080;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(cookieParser());
+
+// Configuración de sesión
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true
+}));
+
+// Inicializar Passport y manejar sesiones
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Configuración de Handlebars
 const hbs = engine({
@@ -43,6 +65,9 @@ app.set('views', path.join(__dirname, 'views'));
 app.use('/', viewsRouter);
 app.use('/api/products', prodsRouter);
 app.use('/api/carts', cartsRouter);
+app.use('/api/user', userRouter);
+app.use('/api/sessions', authRoutes);
+app.use('/api', currentUser, protectedRouter);
 
 // Iniciar servidor HTTP en el puerto especificado
 server.listen(PORT, () => {

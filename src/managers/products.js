@@ -67,7 +67,6 @@ export class ProductManager {
     async getProductById(id) {
         try {
             if (!ObjectId.isValid(id)) {
-                // console.log('ID inválido:', id);
                 return null;
             }
             const product = await Product.findById(id);
