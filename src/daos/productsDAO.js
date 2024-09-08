@@ -1,8 +1,8 @@
-import Product from '../models/Product.js'
+import Product from '../models/Product.js';
 import mongoose from 'mongoose';
+import { ProductDTO } from '../dtos/ProductDTO.js';
 const { ObjectId } = mongoose.Types;
-
-export class ProductManager {
+class ProductManager {
     async addProduct(title, description, price, thumbnail, code, stock, category) {
         const duplicateCode = await Product.findOne({ code });
         if (duplicateCode) {
@@ -13,12 +13,13 @@ export class ProductManager {
         try {
             await newProduct.save();
             console.log('Producto añadido correctamente');
-            return { success: true, message: "Producto añadido correctamente", product: newProduct };
+            return { success: true, message: "Producto añadido correctamente", product: ProductDTO.fromProduct(newProduct) };
         } catch (error) {
             console.error('Error al guardar productos:', error.message);
             return { success: false, message: "Error al guardar productos" };
         }
     }
+
     async getProducts({ limit = 10, page = 1, sort = 'asc' } = {}) {
         try {
             const sortOrder = sort === 'asc' ? 1 : -1;
@@ -27,7 +28,7 @@ export class ProductManager {
                 .sort({ price: sortOrder })
                 .skip(skip)
                 .limit(limit);
-            return products;
+            return products.map(product => ProductDTO.fromProduct(product));
         } catch (error) {
             console.error('Error al obtener productos:', error.message);
             return [];
@@ -70,19 +71,22 @@ export class ProductManager {
                 return null;
             }
             const product = await Product.findById(id);
-            return product || null;
+            return product ? ProductDTO.fromProduct(product) : null;
         } catch (error) {
             console.error('Error al obtener producto:', error.message);
             return null;
         }
     }
+
     async getProductByCode(code) {
         try {
             const product = await Product.findOne({ code });
-            return product || null;
+            return product ? ProductDTO.fromProduct(product) : null;
         } catch (error) {
             console.error('Error al obtener producto por código:', error.message);
             return null;
         }
     }
 }
+
+export const productManager = new ProductManager();

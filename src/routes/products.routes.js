@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { ProductManager } from '../managers/products.js';
+import { productManager as manager } from '../daos/productsDAO.js';
 import Product from '../models/Product.js';
+import authorizeRole from '../middleware/guard.auth.js';
 
 const prodsRouter = Router();
-const manager = new ProductManager();
 
 prodsRouter.get('/', async (req, res) => {
     try {
@@ -59,7 +59,7 @@ prodsRouter.get('/:id', async (req, res) => {
     res.send(await manager.getProductById(req.params.id));
 });
 
-prodsRouter.post('/', async (req, res) => {
+prodsRouter.post('/', authorizeRole('admin'), async (req, res) => {
     const { title, description, price, thumbnail, code, stock, category } = req.body;
 
     try {
@@ -74,7 +74,7 @@ prodsRouter.post('/', async (req, res) => {
     }
 });
 
-prodsRouter.put('/:id', async (req, res) => {
+prodsRouter.put('/:id', authorizeRole('admin'), async (req, res) => {
     const { id } = req.params;
     const updatedProduct = req.body;
     const confirmacion = await manager.getProductById(id);
@@ -87,7 +87,7 @@ prodsRouter.put('/:id', async (req, res) => {
     }
 });
 
-prodsRouter.delete('/:id', async (req, res) => {
+prodsRouter.delete('/:id', authorizeRole('admin'), async (req, res) => {
     const { id } = req.params;
     const confirmacion = await manager.getProductById(id);
 

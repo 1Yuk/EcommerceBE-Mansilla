@@ -2,10 +2,11 @@ import express from 'express';
 import passport from 'passport';
 import { generateToken } from '../utils/jwt.js';
 import currentUser from '../middleware/currentUser.js';
+import UserDTO from '../dtos/UserDTO.js';
+import authorizeRole from '../middleware/guard.auth.js';
 
 const authRouter = express.Router();
 
-// Ruta para login
 authRouter.post('/login', (req, res, next) => {
     passport.authenticate('local', (err, user, info) => {
         if (err) return next(err);
@@ -19,18 +20,18 @@ authRouter.post('/login', (req, res, next) => {
     })(req, res, next);
 });
 
-// Ruta para logout
 authRouter.post('/logout', (req, res) => {
     res.clearCookie('jwt');
     res.status(200).json({ message: 'Sesión cerrada correctamente' });
 });
 
-// Ruta para obtener datos del usuario
-authRouter.get('/current', currentUser, (req, res) => {
+authRouter.get('/current', authorizeRole('admin'), currentUser, (req, res) => {
     if (req.user) {
+        const userDTO = new UserDTO(req.user);
+
         return res.status(200).json({
             message: 'Usuario autenticado',
-            user: req.user,
+            user: userDTO,
         });
     } else {
         return res.status(401).json({ message: 'No autorizado' });

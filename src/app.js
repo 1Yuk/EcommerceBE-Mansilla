@@ -13,15 +13,12 @@ import cartsRouter from './routes/carts.routes.js';
 import userRouter from './routes/users.routes.js'
 import authRoutes from './routes/auth.routes.js';
 import protectedRouter from './routes/protected.routes.js';
-import { ProductManager } from './managers/products.js';
+import { productManager } from './daos/productsDAO.js';
 import currentUser from './middleware/currentUser.js'
 import mongoose from 'mongoose';
 import './utils/passport.js';
 import dotenv from 'dotenv';
 dotenv.config();
-
-// Creación de instancia de ProductManager
-const productManager = new ProductManager();
 
 // Variables para __dirname con ES6 modules
 const __filename = fileURLToPath(import.meta.url);

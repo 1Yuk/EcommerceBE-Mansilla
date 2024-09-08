@@ -1,34 +1,33 @@
 import { isValidObjectId } from 'mongoose';
 import Cart from '../models/Cart.js';
-import { ProductManager } from './products.js';
-
-const productManager = new ProductManager();
+import { CartDTO } from '../dtos/CartDTO.js';
+import { productManager } from './productsDAO.js';
 
 class CartManager {
     async getAllCarts() {
-        return await Cart.find().populate('products.product');
-    }
-
-    async clearAllCarts() {
-        await Cart.updateMany({}, { $set: { products: [] } });
+        const carts = await Cart.find().populate('products.product');
+        return CartDTO.fromDocumentArray(carts);
     }
 
     async getCartById(cartId) {
-        return await Cart.findById(cartId).populate('products.product');
+        const cart = await Cart.findById(cartId).populate('products.product');
+        return CartDTO.fromDocument(cart);
     }
 
-    async saveCart(cart) {
+    async saveCart(cartDTO) {
+        const cartDocument = cartDTO.toDocument();
+        const cart = new Cart(cartDocument);
         return await cart.save();
     }
 
     async createCart() {
         const newCart = new Cart();
-        newCart.save()
-        return newCart;
+        await newCart.save();
+        return CartDTO.fromDocument(newCart);
     }
 
     async updateCart(cartId, products) {
-        const cart = await this.getCartById(cartId);
+        const cart = await Cart.findById(cartId).populate('products.product');
         if (!cart) {
             throw new Error('Carrito no encontrado');
         }
@@ -41,14 +40,14 @@ class CartManager {
             cart.products = validProducts;
             await cart.save();
             const populatedCart = await Cart.findById(cartId).populate('products.product').exec();
-            return populatedCart;
+            return CartDTO.fromDocument(populatedCart);
         } else {
             throw new Error('La lista de productos proporcionada no es válida.');
         }
     }
 
     async addProductToCart(cartId, productId, quantity) {
-        const cart = await this.getCartById(cartId);
+        const cart = await Cart.findById(cartId).populate('products.product');
         if (!cart) {
             throw new Error('Carrito no encontrado');
         }
@@ -63,26 +62,25 @@ class CartManager {
             cart.products.push({ product: productId, quantity });
         }
         await cart.save();
-        return cart;
+        return CartDTO.fromDocument(cart);
     }
 
     async removeProductFromCart(cartId, productId) {
-        const cart = await this.getCartById(cartId);
+        const cart = await Cart.findById(cartId).populate('products.product');
         if (!cart) {
             throw new Error('Carrito no encontrado');
         }
         cart.products = cart.products.filter(p => {
             return p.product._id.toString() !== productId.toString();
         });
-        await this.saveCart(cart);
-        await cart.populate('products.product');
-        return cart;
+        await cart.save();
+        return CartDTO.fromDocument(cart);
     }
 
     async updateProductQuantity(cartId, productId, quantity) {
-        const cart = await Cart.findById(cartId);
+        const cart = await Cart.findById(cartId).populate('products.product');
         if (!cart) {
-            throw new Error('Cart not found');
+            throw new Error('Carrito no encontrado');
         }
         const productIndex = cart.products.findIndex(p => p.product.toString() === productId);
         if (productIndex > -1) {
@@ -91,19 +89,18 @@ class CartManager {
             cart.products.push({ product: productId, quantity });
         }
         await cart.save();
-        await cart.populate('products.product');
-        return cart;
+        return CartDTO.fromDocument(cart);
     }
 
     async clearCart(cartId) {
-        const cart = await this.getCartById(cartId);
+        const cart = await Cart.findById(cartId).populate('products.product');
         if (!cart) {
             throw new Error('Carrito no encontrado');
         }
         cart.products = [];
-        await this.saveCart(cart);
-        return cart.populate('products.product').execPopulate();
+        await cart.save();
+        return CartDTO.fromDocument(cart);
     }
 }
 
-export const cartManager = new CartManager();
+export const CartDao = new CartManager();
