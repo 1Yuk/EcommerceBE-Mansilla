@@ -2,7 +2,20 @@ import Product from '../models/Product.js';
 import mongoose from 'mongoose';
 import { ProductDTO } from '../dtos/ProductDTO.js';
 const { ObjectId } = mongoose.Types;
+
 class ProductManager {
+    async getProductById(id) {
+        try {
+            if (!ObjectId.isValid(id)) {
+                return null;
+            }
+            const product = await Product.findById(id);
+            return product ? ProductDTO.fromProduct(product) : null;
+        } catch (error) {
+            console.error('Error al obtener producto:', error.message);
+            return null;
+        }
+    }
     async addProduct(title, description, price, thumbnail, code, stock, category) {
         const duplicateCode = await Product.findOne({ code });
         if (duplicateCode) {
@@ -62,19 +75,6 @@ class ProductManager {
             }
         } catch (error) {
             console.error('Error al actualizar producto:', error.message);
-        }
-    }
-
-    async getProductById(id) {
-        try {
-            if (!ObjectId.isValid(id)) {
-                return null;
-            }
-            const product = await Product.findById(id);
-            return product ? ProductDTO.fromProduct(product) : null;
-        } catch (error) {
-            console.error('Error al obtener producto:', error.message);
-            return null;
         }
     }
 

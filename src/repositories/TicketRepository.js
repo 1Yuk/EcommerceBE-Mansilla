@@ -3,6 +3,7 @@ import Ticket from "../models/ticket.js";
 class TicketRepository {
     constructor() {
     }
+
     async createTicket(ticketData) {
         try {
             const newTicket = new Ticket(ticketData);

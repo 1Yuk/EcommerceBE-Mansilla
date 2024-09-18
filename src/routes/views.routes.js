@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { productManager } from "../daos/productsDAO.js";
-import { CartDao } from "../daos/CartDao.js";
+import { productManager } from "../services/ProductService.js";
+import CartService from "../services/CartService.js";
 
 const viewsRouter = Router();
+const cartService = new CartService();
 
 viewsRouter.get('/', async (req, res) => {
     try {
@@ -38,14 +39,14 @@ viewsRouter.get('/products/:pid', async (req, res) => {
 viewsRouter.get("/carts/:cid", async (req, res) => {
     try {
         const { cid } = req.params;
-        const cart = await CartDao.getCartById(cid);
+        const cart = await cartService.getCartById(cid);
 
         if (!cart) {
             return res.status(404).json({ message: "Carrito no encontrado" });
         }
         const { productId, quantity } = req.body;
         if (productId && quantity) {
-            const updatedCart = await CartDao.addProductToCart(cid, productId, quantity);
+            const updatedCart = await cartService.addProductToCart(cid, productId, quantity);
             res.render("carts", { cart: updatedCart });
         }
         res.render("carts", { cart });

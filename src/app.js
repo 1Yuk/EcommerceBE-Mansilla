@@ -11,9 +11,9 @@ import viewsRouter from './routes/views.routes.js';
 import prodsRouter from './routes/products.routes.js';
 import cartsRouter from './routes/carts.routes.js';
 import userRouter from './routes/users.routes.js'
-import authRoutes from './routes/auth.routes.js';
+import sessionsRouter from './routes/sessions.routes.js';
 import protectedRouter from './routes/protected.routes.js';
-import { productManager } from './daos/productsDAO.js';
+import { productManager } from './services/ProductService.js';
 import currentUser from './middleware/currentUser.js'
 import mongoose from 'mongoose';
 import './utils/passport.js';
@@ -63,7 +63,7 @@ app.use('/', viewsRouter);
 app.use('/api/products', prodsRouter);
 app.use('/api/carts', cartsRouter);
 app.use('/api/user', userRouter);
-app.use('/api/sessions', authRoutes);
+app.use('/api/sessions', sessionsRouter);
 app.use('/api', currentUser, protectedRouter);
 
 // Iniciar servidor HTTP en el puerto especificado

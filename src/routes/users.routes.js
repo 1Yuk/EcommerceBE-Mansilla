@@ -1,5 +1,5 @@
 import express from 'express';
-import { createUser } from '../daos/userDAO.js';
+import { createUser } from '../services/UserService.js';
 
 const userRouter = express.Router();
 userRouter.post('/', async (req, res) => {

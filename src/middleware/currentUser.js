@@ -36,22 +36,21 @@ passport.use(
 const currentUser = (req, res, next) => {
     passport.authenticate('jwt', { session: false }, async (err, user, info) => {
         if (err) {
-            return next(err);
+            return res.status(500).json({ message: 'Error en la autenticación' });
         }
         if (!user) {
-            return res.status(401).json({ message: 'Unauthorized' });
+            return res.status(401).json({ message: 'No autorizado, token no válido o expirado' });
         }
-
         try {
             const fullUser = await User.findById(user._id);
             if (!fullUser) {
-                return res.status(401).json({ message: 'Unauthorized' });
+                return res.status(401).json({ message: 'Usuario no encontrado' });
             }
             const userDTO = new UserDTO(fullUser);
             req.user = userDTO;
             next();
         } catch (error) {
-            next(error);
+            return res.status(500).json({ message: 'Error al recuperar el usuario', error: error.message });
         }
     })(req, res, next);
 };
