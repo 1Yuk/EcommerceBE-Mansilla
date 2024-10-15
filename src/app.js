@@ -11,6 +11,7 @@ import viewsRouter from './routes/views.routes.js';
 import prodsRouter from './routes/products.routes.js';
 import cartsRouter from './routes/carts.routes.js';
 import userRouter from './routes/users.routes.js'
+import mocksRouter from './routes/mocks.router.js';
 import sessionsRouter from './routes/sessions.routes.js';
 import protectedRouter from './routes/protected.routes.js';
 import { productManager } from './services/ProductService.js';
@@ -65,6 +66,7 @@ app.use('/api/carts', cartsRouter);
 app.use('/api/user', userRouter);
 app.use('/api/sessions', sessionsRouter);
 app.use('/api', currentUser, protectedRouter);
+app.use('/api/mocks', mocksRouter);
 
 // Iniciar servidor HTTP en el puerto especificado
 server.listen(PORT, () => {
