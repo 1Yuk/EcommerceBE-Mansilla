@@ -20,7 +20,6 @@ class DAOFactory {
         return new TicketRepository();
     }
 
-    // Puedes agregar otros DAOs si los necesitas (por ejemplo, TicketDAO)
 }
 
 export default DAOFactory;

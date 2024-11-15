@@ -1,9 +1,8 @@
-import Ticket from "../models/ticket.js";
+import Ticket from "../models/Ticket.js";
 
 class TicketRepository {
     constructor() {
     }
-
     async createTicket(ticketData) {
         try {
             const newTicket = new Ticket(ticketData);

@@ -59,7 +59,6 @@ class CartRepository {
         return await this.saveCart(cart);
     }
 
-
     async updateProductQuantity(cartId, productId, quantity) {
         const cart = await this.getCartById(cartId);
         const productIndex = cart.products.findIndex(p => p.product.toString() === productId);

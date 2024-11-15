@@ -18,6 +18,8 @@ import { productManager } from './services/ProductService.js';
 import currentUser from './middleware/currentUser.js'
 import mongoose from 'mongoose';
 import './utils/passport.js';
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './utils/swaggerConfig.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -67,6 +69,7 @@ app.use('/api/user', userRouter);
 app.use('/api/sessions', sessionsRouter);
 app.use('/api', currentUser, protectedRouter);
 app.use('/api/mocks', mocksRouter);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Iniciar servidor HTTP en el puerto especificado
 server.listen(PORT, () => {
